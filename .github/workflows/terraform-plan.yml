@@ -37,8 +37,13 @@ jobs:
       run: terraform validate
       working-directory: ./terraform/test
 
-    - name: pladlasp Terraform
+    - name: Terraform Plan only
       run: terraform plan
+      working-directory: ./terraform/test
+     
+    - name: Plan Terraform
+      id: plan
+      run: terraform plan -no-color > plan.txt
       working-directory: ./terraform/test
 
     - name: Format plan
@@ -55,11 +60,6 @@ jobs:
 
     - name: idksakd
       run: echo $GITHUB_ENV
-     
-    - name: Plan Terraform
-      id: plan
-      run: terraform plan -no-color > plan.txt
-      working-directory: ./terraform/test
 
     - name: Post Plan to PR
       if: ${{ github.event_name == 'pull_request' }}
