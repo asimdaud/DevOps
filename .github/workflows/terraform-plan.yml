@@ -64,7 +64,6 @@ jobs:
 
     - name: truncate terraform plan result
       run: |
-        echo "$(terraform output --json)" | jq -r 'keys[] as $k | "\($k)=\(.[$k].value)"' >> $GITHUB_OUTPUT
         echo "$(terraform output --json)" | jq -r 'keys[] as $k | "\($k)=\(.[$k].value)"' >> $GITHUB_ENV
       working-directory: ./apps/jenkins/terraform
   
