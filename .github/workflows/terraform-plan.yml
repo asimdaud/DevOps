@@ -51,6 +51,17 @@ jobs:
       working-directory: ./apps/jenkins/terraform
           
 
+    - uses: hashicorp/setup-terraform@v3
+        
+    - run: terraform init
+        
+    - id: plan1
+      run: terraform plan -no-color
+        
+    - run: echo ${{ steps.plan1.outputs.stdout }}
+    - run: echo ${{ steps.plan1.outputs.stderr }}
+    - run: echo ${{ steps.plan1.outputs.exitcode }}
+
     - name: truncate terraform plan result
       run: |
         echo "$(terraform output --json)" | jq -r 'keys[] as $k | "\($k)=\(.[$k].value)"' >> $GITHUB_OUTPUT
