@@ -47,17 +47,13 @@ jobs:
      
     - name: Plan Terraform
       id: plan
-      run: terraform plan -no-color -input=false
+      run: terraform plan -no-color -input=false 
       working-directory: ./apps/jenkins/terraform
           
-    - name: generate random delimiter
-      run: echo "DELIMITER=$(uuidgen)" >> $GITHUB_ENV
 
     - name: truncate terraform plan result
       run: |
-        echo '[maybe truncated]' >> $GITHUB_ENV
-        ${{ format('{0}{1}', steps.plan.outputs.stderr, steps.plan.outputs.stdout) }}
-        echo >> $GITHUB_ENV
+        terraform plan -no-color -input=false  >> $GITHUB_ENV
       working-directory: ./apps/jenkins/terraform
   
     
