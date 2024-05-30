@@ -86,7 +86,6 @@ jobs:
         EOF
         )
         echo "${plan}" | grep -v 'Refreshing state' >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
       working-directory: ./terraform/test
   
     - name: create comment from plan result
