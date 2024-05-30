@@ -43,7 +43,7 @@ jobs:
 
     - name: Plan Terraform
       id: plan
-      run: terraform plan -no-color > plan.txt
+      run: terraform plan > plan.txt
       working-directory: ./terraform/test
 
     - name: Post Plan to PR
