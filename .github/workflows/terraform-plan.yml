@@ -31,20 +31,20 @@ jobs:
 
     - name: Initialize Terraform
       run: terraform init
-      working-directory: ./terraform/test
+      working-directory: ./apps/test
 
     - name: Validate Terraform
       run: terraform validate
-      working-directory: ./terraform/test
+      working-directory: ./apps/test
 
     - name: Terraform Plan only
       run: terraform plan
-      working-directory: ./terraform/test
+      working-directory: ./apps/test
      
     - name: Plan Terraform
       id: plan
       run: terraform plan -no-color -input=false
-      working-directory: ./terraform/test
+      working-directory: ./apps/test
           
     - name: generate random delimiter
       run: echo "DELIMITER=$(uuidgen)" >> $GITHUB_ENV
@@ -58,7 +58,7 @@ jobs:
         ${{ env.DELIMITER }}
         echo >> $GITHUB_ENV
         echo "${{ env.DELIMITER }}" >> $GITHUB_ENV
-      working-directory: ./terraform/test
+      working-directory: ./apps/test
   
     
     - name: post plan as sticky comment
