@@ -53,6 +53,13 @@ jobs:
         echo "EOF" >> $GITHUB_ENV
       working-directory: ./terraform/test
 
+    - name: idksakd
+      run: |
+        echo "PLAN<<EOF" >> $GITHUB_ENV
+        echo "${plan:0:65536}" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+
     - name: Plan Terraform
       id: plan
       run: terraform plan -no-color > plan.txt
