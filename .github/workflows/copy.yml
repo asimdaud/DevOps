@@ -1,12 +1,9 @@
-name: Terraform Plan
+name: Terraform Plan Copy
 
 on:
   pull_request:
     branches:
       - master
-  push:
-    paths:
-      - 'apps/jenkins/**'
     
 defaults:
   run:
