@@ -61,10 +61,10 @@ jobs:
     - name: idksakd
       run: echo $GITHUB_ENV
 
-    - name: Post Plan to PR
-      if: ${{ github.event_name == 'pull_request' }}
-      uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        hide_and_recreate: true
-        hide_classify: "OUTDATED"
-        path : ./terraform/test/plan.txt
+    # - name: Post Plan to PR
+    #   if: ${{ github.event_name == 'pull_request' }}
+    #   uses: marocchino/sticky-pull-request-comment@v2
+    #   with:
+    #     hide_and_recreate: true
+    #     hide_classify: "OUTDATED"
+    #     path : ./terraform/test/plan.txt
