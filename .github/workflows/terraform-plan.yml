@@ -44,7 +44,7 @@ jobs:
     - name: Plan Terraform
       id: plan
       run: terraform plan -no-color > plan.txt
-      working-directory: ./terraform/test
+      working-directory: ./terraform.test
 
     - name: Format plan
       id: format-plan
