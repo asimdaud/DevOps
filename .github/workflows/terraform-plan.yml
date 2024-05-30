@@ -96,6 +96,22 @@ jobs:
         echo "${{ env.DELIMITER }}" >> $GITHUB_ENV
       working-directory: ./terraform/test
   
+    
+    - name: post plan as sticky comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: plan
+        message: |
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+          <details><summary>Show Plan</summary>
+
+          ```
+          ${{ env.PLAN }}
+          ```
+
+          </details>
+
+    
     - name: create comment from plan result
       uses: actions/github-script@0.9.0
       if: github.event_name == 'pull_request'
@@ -107,6 +123,9 @@ jobs:
           
           <details><summary>Show Plan</summary>
           
+          \`\`\`\n
+          ${ process.env.PLAN }
+          \`\`\`
           
           </details>
           
