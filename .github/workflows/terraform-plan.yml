@@ -27,16 +27,16 @@ jobs:
 
     - name: Initialize Terraform
       run: terraform init
-      working-directory: ./terraform.test
+      working-directory: ./terraform/test
 
     - name: Validate Terraform
       run: terraform validate
-      working-directory: ./terraform.test
+      working-directory: ./terraform/test
 
     - name: Plan Terraform
       id: plan
       run: terraform plan -no-color > plan.txt
-      working-directory: ./terraform.test
+      working-directory: ./terraform/test
 
     - name: Post Plan to PR
       if: ${{ github.event_name == 'pull_request' }}
