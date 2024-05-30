@@ -79,14 +79,21 @@ jobs:
             body: '👋 Thanks for reporting!'
           })
 
+
+
+          
+    - name: generate random delimiter
+      run: echo "DELIMITER=$(uuidgen)" >> $GITHUB_ENV
+
     - name: truncate terraform plan result
       run: |
-        plan=$(cat <<'EOF'
-        ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
-        EOF
-        )
-        echo "${plan}" | grep -v 'Refreshing state' >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
+        echo "PLAN<<${{ env.DELIMITER }}" >> $GITHUB_ENV
+        echo '[maybe truncated]' >> $GITHUB_ENV
+        tail --bytes=10000 <<'${{ env.DELIMITER }}' >> $GITHUB_ENV
+        ${{ format('{0}{1}', steps.plan.outputs.stderr, steps.plan.outputs.stdout) }}
+        ${{ env.DELIMITER }}
+        echo >> $GITHUB_ENV
+        echo "${{ env.DELIMITER }}" >> $GITHUB_ENV
       working-directory: ./terraform/test
   
     - name: create comment from plan result
