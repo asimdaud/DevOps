@@ -79,18 +79,37 @@ jobs:
             body: '👋 Thanks for reporting!'
           })
 
-    - name: Update Comment1
-      uses: peter-evans/create-or-update-comment@v2
+    - name: truncate terraform plan result
+      run: |
+        plan=$(cat <<'EOF'
+        ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        EOF
+        )
+        echo "${plan}" | grep -v 'Refreshing state' >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+  
+    - name: create comment from plan result
+      uses: actions/github-script@0.9.0
+      if: github.event_name == 'pull_request'
       with:
-        issue-number: random123
-        body: |-
-          ## Build Preview
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
           
+          <details><summary>Show Plan</summary>
           
-          You can find files attached to the below linked Workflow Run URL (Logs).
+          \`\`\`\n
+          ${ process.env.PLAN }
+          \`\`\`
           
-          Please note that files only stay for around 90 days!
+          </details>
+          
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.TF_WORK_DIR }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
-          | Name      | Link                                                                                |
-          |-----------|-------------------------------------------------------------------------------------|
-          | Commit    | ${{ github.event.pull_request.head.sha }}                                           |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })```
