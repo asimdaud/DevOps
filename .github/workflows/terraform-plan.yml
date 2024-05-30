@@ -82,7 +82,7 @@ jobs:
     - name: Update Comment
       uses: peter-evans/create-or-update-comment@v2
       with:
-        issue-number: ${{ needs.buildJars.outputs.comment_id }}
+        issue-number: random123
         body: |-
           ## Build Preview
           
@@ -103,7 +103,7 @@ jobs:
     - name: Update Comment
       uses: peter-evans/create-or-update-comment@v2
       with:
-        issue-number: ${{ needs.buildJars.outputs.comment_id }}
+        issue-number: random444
         body: |-
           ## Build Preview
           
