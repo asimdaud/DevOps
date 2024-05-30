@@ -79,7 +79,7 @@ jobs:
             body: '👋 Thanks for reporting!'
           })
 
-    - name: Update Comment
+    - name: Update Comment1
       uses: peter-evans/create-or-update-comment@v2
       with:
         issue-number: random123
