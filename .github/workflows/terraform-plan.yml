@@ -4,6 +4,10 @@ on:
   pull_request:
     branches:
       - master
+  push:
+    paths:
+      - 'apps/jenkins/**'
+    
 
 permissions:
   pull-requests: write
@@ -31,20 +35,20 @@ jobs:
 
     - name: Initialize Terraform
       run: terraform init
-      working-directory: ./apps/test
+      working-directory: ./apps/jenkins
 
     - name: Validate Terraform
       run: terraform validate
-      working-directory: ./apps/test
+      working-directory: ./apps/jenkins
 
     - name: Terraform Plan only
       run: terraform plan
-      working-directory: ./apps/test
+      working-directory: ./apps/jenkins
      
     - name: Plan Terraform
       id: plan
       run: terraform plan -no-color -input=false
-      working-directory: ./apps/test
+      working-directory: ./apps/jenkins
           
     - name: generate random delimiter
       run: echo "DELIMITER=$(uuidgen)" >> $GITHUB_ENV
@@ -58,7 +62,7 @@ jobs:
         ${{ env.DELIMITER }}
         echo >> $GITHUB_ENV
         echo "${{ env.DELIMITER }}" >> $GITHUB_ENV
-      working-directory: ./apps/test
+      working-directory: ./apps/jenkins
   
     
     - name: post plan as sticky comment
