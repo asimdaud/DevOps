@@ -44,19 +44,19 @@ jobs:
     - name: Plan Terraform
       id: plan
       run: terraform plan -no-color > plan.txt
-      working-directory: ./terraform.test
-
-    - name: Format plan
-      id: format-plan
-      run: |
-        plan=$(cat <<'EOF'
-        ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
-        EOF
-        )
-        echo "PLAN<<EOF" >> $GITHUB_ENV
-        echo "${plan:0:65536}" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
       working-directory: ./terraform/test
+
+    # - name: Format plan
+    #   id: format-plan
+    #   run: |
+    #     plan=$(cat <<'EOF'
+    #     ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+    #     EOF
+    #     )
+    #     echo "PLAN<<EOF" >> $GITHUB_ENV
+    #     echo "${plan:0:65536}" >> $GITHUB_ENV
+    #     echo "EOF" >> $GITHUB_ENV
+    #   working-directory: ./terraform/test
 
     - name: idksakd
       run: echo $GITHUB_ENV
@@ -80,7 +80,6 @@ jobs:
           })
 
     - name: Update Comment
-      if: ${{ failure() }}
       uses: peter-evans/create-or-update-comment@v2
       with:
         issue-number: ${{ needs.buildJars.outputs.comment_id }}
