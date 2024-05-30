@@ -72,11 +72,13 @@ jobs:
     - uses: actions/github-script@v6
       with:
         script: |
+          const output = `${ process.env.PLAN }`;
+  
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: `${{ process.env.PLAN }}\`'👋 Thanks for reporting!'
+            body: output
           })
 
 
