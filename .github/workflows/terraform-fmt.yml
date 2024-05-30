@@ -9,7 +9,7 @@ on:
       - 'apps/jenkins/**'
 
 jobs:
-  terraform-plan:
+  terraform-fmt:
     runs-on: ubuntu-latest
 
     steps:
