@@ -86,7 +86,6 @@ jobs:
         body: |-
           ## Build Preview
           
-          [![badge]](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           
           You can find files attached to the below linked Workflow Run URL (Logs).
           
