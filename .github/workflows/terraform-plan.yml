@@ -37,6 +37,10 @@ jobs:
       run: terraform validate
       working-directory: ./terraform/test
 
+    - name: pladlasp Terraform
+      run: terraform plan
+      working-directory: ./terraform/test
+
     - name: Plan Terraform
       id: plan
       run: terraform plan -no-color > plan.txt
@@ -46,4 +50,6 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       uses: marocchino/sticky-pull-request-comment@v2
       with:
-        path: plan.txt
+        hide_and_recreate: true
+        hide_classify: "OUTDATED"
+        message : Heya
