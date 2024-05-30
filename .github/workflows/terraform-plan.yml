@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+permissions:
+  pull-requests: write
+
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -23,26 +27,54 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: $AWS_REGION
-
-    - name: Change directory
-      run: cd/terraform/test
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Initialize Terraform
       run: terraform init
-      working-directory: ./terraform.test
+      working-directory: ./terraform/test
 
     - name: Validate Terraform
       run: terraform validate
-      working-directory: ./terraform.test
+      working-directory: ./terraform/test
 
+    - name: Terraform Plan only
+      run: terraform plan
+      working-directory: ./terraform/test
+     
     - name: Plan Terraform
       id: plan
-      run: terraform plan -no-color > plan.txt
-      working-directory: ./terraform.test
+      run: terraform plan -no-color -input=false
+      working-directory: ./terraform/test
+          
+    - name: generate random delimiter
+      run: echo "DELIMITER=$(uuidgen)" >> $GITHUB_ENV
 
-    - name: Post Plan to PR
-      if: ${{ github.event_name == 'pull_request' }}
+    - name: truncate terraform plan result
+      run: |
+        echo "PLAN<<${{ env.DELIMITER }}" >> $GITHUB_ENV
+        echo '[maybe truncated]' >> $GITHUB_ENV
+        tail --bytes=10000 <<'${{ env.DELIMITER }}' >> $GITHUB_ENV
+        ${{ format('{0}{1}', steps.plan.outputs.stderr, steps.plan.outputs.stdout) }}
+        ${{ env.DELIMITER }}
+        echo >> $GITHUB_ENV
+        echo "${{ env.DELIMITER }}" >> $GITHUB_ENV
+      working-directory: ./terraform/test
+  
+    
+    - name: post plan as sticky comment
       uses: marocchino/sticky-pull-request-comment@v2
       with:
-        path: plan.txt
+        header: plan
+        hide_and_recreate: true
+        hide_classify: "OUTDATED"
+        message: |
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+          <details><summary>Show Plan</summary>
+
+          ```
+          ${{ env.PLAN }}
+          ```
+
+          </details>
+
+  
