@@ -1,20 +1,21 @@
-name: Terraform Plan Copy
+name: Terraform Plan 2
 
 on:
   pull_request:
     branches:
       - master
+  push:
+    paths:
+      - 'apps/jenkins/**'
     
-defaults:
-  run:
-    working-directory: ${{ env.tf_actions_working_dir }}
 
 permissions:
   pull-requests: write
 
 
+
 jobs:
-  terraform-plan:
+  terraform-plan-2:
     runs-on: ubuntu-latest
 
     steps:

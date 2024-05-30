@@ -41,30 +41,16 @@ jobs:
       run: terraform validate
       working-directory: ./apps/jenkins/terraform
 
-    - name: Terraform Plan only
-      run: terraform plan
-      working-directory: ./apps/jenkins/terraform
-     
     - name: Plan Terraform
       id: plan
       run: terraform plan -no-color -input=false 
       working-directory: ./apps/jenkins/terraform
-          
-
-    - uses: hashicorp/setup-terraform@v3
-        
-    - run: terraform init
+                  
+    - run: echo ${{ steps.plan.outputs.stdout }}
       working-directory: ./apps/jenkins/terraform
-        
-    - id: plan1
-      run: terraform plan -no-color
+    - run: echo ${{ steps.plan.outputs.stderr }}
       working-directory: ./apps/jenkins/terraform
-        
-    - run: echo ${{ steps.plan1.outputs.stdout }}
-      working-directory: ./apps/jenkins/terraform
-    - run: echo ${{ steps.plan1.outputs.stderr }}
-      working-directory: ./apps/jenkins/terraform
-    - run: echo ${{ steps.plan1.outputs.exitcode }}
+    - run: echo ${{ steps.plan.outputs.exitcode }}
       working-directory: ./apps/jenkins/terraform
 
     - name: truncate terraform plan result
