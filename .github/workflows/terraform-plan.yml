@@ -43,44 +43,8 @@ jobs:
      
     - name: Plan Terraform
       id: plan
-      run: terraform plan -no-color > plan.txt
+      run: terraform plan -no-color -input=false
       working-directory: ./terraform/test
-
-    - name: Format plan
-      id: format-plan
-      run: |
-        plan=$(cat <<'EOF'
-        ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
-        EOF
-        )
-        echo "PLAN<<EOF" >> $GITHUB_ENV
-        echo "${plan:0:65536}" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-      working-directory: ./terraform/test
-
-    - name: idksakd
-      run: echo $GITHUB_ENV
-
-    # - name: Post Plan to PR
-    #   if: ${{ github.event_name == 'pull_request' }}
-    #   uses: marocchino/sticky-pull-request-comment@v2
-    #   with:
-    #     hide_and_recreate: true
-    #     hide_classify: "OUTDATED"
-    #     path : ./terraform/test/plan.txt
-
-    - uses: actions/github-script@v6
-      with:
-        script: |
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: '👋 Thanks for reporting!'
-          })
-
-
-
           
     - name: generate random delimiter
       run: echo "DELIMITER=$(uuidgen)" >> $GITHUB_ENV
@@ -111,30 +75,4 @@ jobs:
 
           </details>
 
-    
-    - name: create comment from plan result
-      uses: actions/github-script@0.9.0
-      if: github.event_name == 'pull_request'
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-          
-          <details><summary>Show Plan</summary>
-          
-          \`\`\`\n
-          ${ process.env.PLAN }
-          \`\`\`
-          
-          </details>
-          
-          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.TF_WORK_DIR }}\`, Workflow: \`${{ github.workflow }}\`*`
-
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          })```
-        working-directory: ./terraform/test
+  
