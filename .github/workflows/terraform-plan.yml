@@ -46,17 +46,17 @@ jobs:
       run: terraform plan -no-color > plan.txt
       working-directory: ./terraform/test
 
-    # - name: Format plan
-    #   id: format-plan
-    #   run: |
-    #     plan=$(cat <<'EOF'
-    #     ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
-    #     EOF
-    #     )
-    #     echo "PLAN<<EOF" >> $GITHUB_ENV
-    #     echo "${plan:0:65536}" >> $GITHUB_ENV
-    #     echo "EOF" >> $GITHUB_ENV
-    #   working-directory: ./terraform/test
+    - name: Format plan
+      id: format-plan
+      run: |
+        plan=$(cat <<'EOF'
+        ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        EOF
+        )
+        echo "PLAN<<EOF" >> $GITHUB_ENV
+        echo "${plan:0:65536}" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+      working-directory: ./terraform/test
 
     - name: idksakd
       run: echo $GITHUB_ENV
@@ -87,6 +87,7 @@ jobs:
         )
         echo "${plan}" | grep -v 'Refreshing state' >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
+      working-directory: ./terraform/test
   
     - name: create comment from plan result
       uses: actions/github-script@0.9.0
@@ -113,3 +114,4 @@ jobs:
             repo: context.repo.repo,
             body: output
           })```
+        working-directory: ./terraform/test
