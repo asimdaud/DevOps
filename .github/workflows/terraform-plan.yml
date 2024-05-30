@@ -72,16 +72,22 @@ jobs:
     - uses: actions/github-script@v6
       with:
         script: |
-          const output = `${ process.env.PLAN }`;
-  
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: output
+            body: '👋 Thanks for reporting!'
           })
 
-
+    - name: truncate terraform plan result
+      run: |
+        plan=$(cat <<'EOF'
+        ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        EOF
+        )
+        echo "${plan}" | grep -v 'Refreshing state' >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+      working-directory: ./terraform/test
   
     - name: create comment from plan result
       uses: actions/github-script@0.9.0
