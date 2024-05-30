@@ -78,3 +78,23 @@ jobs:
             repo: context.repo.repo,
             body: '👋 Thanks for reporting!'
           })
+
+    - name: Update Comment
+      if: ${{ failure() }}
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        issue-number: ${{ needs.buildJars.outputs.comment_id }}
+        body: |-
+          ## Build Preview
+          
+          [![badge]](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          There was an issue generating the Jar files from your Pull request.
+          Please review the logs linked below for further information.
+          
+          | Name   | Link                                                                                |
+          |--------|-------------------------------------------------------------------------------------|
+          | Commit | ${{ github.event.pull_request.head.sha }}                                           |
+          | Logs   | ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} |
+          
+          [badge]: https://img.shields.io/badge/Build-Failure!-f85149?logo=github&style=for-the-badge
