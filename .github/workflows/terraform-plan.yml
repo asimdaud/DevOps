@@ -41,9 +41,19 @@ jobs:
       run: terraform plan
       working-directory: ./terraform/test
 
+    - name: truncate terraform plan result
+      run: |
+        plan=$(cat <<'EOF'
+        ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        EOF
+        )
+        echo "${plan}" | grep -v 'Refreshing state' >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+      working-directory: ./terraform/test
+
     - name: Plan Terraform
       id: plan
-      run: terraform plan > plan.txt
+      run: terraform plan -no-color > plan.txt
       working-directory: ./terraform/test
 
     - name: Post Plan to PR
