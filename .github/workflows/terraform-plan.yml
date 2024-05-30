@@ -51,15 +51,6 @@ jobs:
         echo "PLAN<<EOF" >> $GITHUB_ENV
         echo "${plan:0:65536}" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
-    
-    - name: truncate terraform plan result
-      run: |
-        plan=$(cat <<'EOF'
-        ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
-        EOF
-        )
-        echo "${plan}" | grep -v 'Refreshing state' >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
       working-directory: ./terraform/test
 
     - name: Plan Terraform
