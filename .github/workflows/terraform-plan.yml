@@ -4,13 +4,17 @@ on:
   pull_request:
     branches:
       - master
+  push:
+    paths:
+      - 'apps/jenkins/**'
+    
 
 permissions:
   pull-requests: write
 
 
 jobs:
-  terraform:
+  terraform-plan:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,54 +33,82 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Initialize Terraform
+    - name: Terraform fmt
+      id: fmt
+      run: terraform fmt -check
+      continue-on-error: true
+      working-directory: ./apps/jenkins/terraform
+
+    - name: Terraform Init
+      id: init
       run: terraform init
-      working-directory: ./apps/test
+      working-directory: ./apps/jenkins/terraform
 
-    - name: Validate Terraform
-      run: terraform validate
-      working-directory: ./apps/test
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+      working-directory: ./apps/jenkins/terraform
 
-    - name: Terraform Plan only
-      run: terraform plan
-      working-directory: ./apps/test
-     
-    - name: Plan Terraform
+    - name: Terraform Plan
       id: plan
-      run: terraform plan -no-color -input=false
-      working-directory: ./apps/test
-          
-    - name: generate random delimiter
-      run: echo "DELIMITER=$(uuidgen)" >> $GITHUB_ENV
-
-    - name: truncate terraform plan result
-      run: |
-        echo "PLAN<<${{ env.DELIMITER }}" >> $GITHUB_ENV
-        echo '[maybe truncated]' >> $GITHUB_ENV
-        tail --bytes=10000 <<'${{ env.DELIMITER }}' >> $GITHUB_ENV
-        ${{ format('{0}{1}', steps.plan.outputs.stderr, steps.plan.outputs.stdout) }}
-        ${{ env.DELIMITER }}
-        echo >> $GITHUB_ENV
-        echo "${{ env.DELIMITER }}" >> $GITHUB_ENV
-      working-directory: ./apps/test
-  
-    
-    - name: post plan as sticky comment
-      uses: marocchino/sticky-pull-request-comment@v2
+      working-directory: ./apps/jenkins/terraform
+      run: terraform plan -no-color
+      continue-on-error: true
+                  
+    - uses: actions/github-script@v7
+      if: github.event_name == 'pull_request'
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
       with:
-        header: plan
-        hide_and_recreate: true
-        hide_classify: "OUTDATED"
-        message: |
-          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-          <details><summary>Show Plan</summary>
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          // 1. Retrieve existing bot comments for the PR
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          })
+          const botComment = comments.find(comment => {
+            return comment.user.type === 'Bot' && comment.body.includes('Terraform Format and Style')
+          })
 
-          ```
-          ${{ env.PLAN }}
-          ```
+          // 2. Prepare format of the comment
+          const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+          #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+          #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+          <details><summary>Validation Output</summary>
+
+          \`\`\`\n
+          ${{ steps.validate.outputs.stdout }}
+          \`\`\`
 
           </details>
-          
-          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.TF_WORK_DIR }}\`, Workflow: \`${{ github.workflow }}\`*`
 
-  
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+          <details><summary>Show Plan</summary>
+
+          \`\`\`\n
+          ${process.env.PLAN}
+          \`\`\`
+
+          </details>
+
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+          // 3. If we have a comment, update it, otherwise create a new one
+          if (botComment) {
+            github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: output
+            })
+          } else {
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+          }
