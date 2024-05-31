@@ -1,12 +1,11 @@
 name: Terraform Plan
 
 on:
-  pull_request:
-    branches:
-      - master
   push:
+    branches: [ master ]
     paths:
       - 'apps/jenkins/**'
+  pull_request:
     
 
 permissions:
