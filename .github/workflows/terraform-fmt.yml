@@ -3,7 +3,7 @@ name: Terraform Format
 on:
   push:
     paths:
-      - 'apps/jenkins/**'
+      - 'terraform/apps/jenkins/**'
 
 jobs:
   terraform-fmt:
@@ -22,4 +22,4 @@ jobs:
       id: fmt
       run: terraform fmt -check
       continue-on-error: true
-      working-directory: ./apps/jenkins/terraform
+      working-directory: ./terraform/apps/jenkins/terraform
