@@ -116,6 +116,7 @@ resource "aws_autoscaling_group" "jenkins" {
   min_size            = 1
   desired_capacity    = 1
   vpc_zone_identifier = var.subnets
+  target_group_arns = [aws_lb_target_group.jenkins.arn]
   launch_template {
     id      = aws_launch_template.jenkins.id
     version = aws_launch_template.jenkins.latest_version
@@ -136,10 +137,4 @@ resource "aws_autoscaling_group" "jenkins" {
   #   strategy = "Rolling"
   #   triggers = ["launch_template"]
   # }
-}
-
-
-resource "aws_autoscaling_attachment" "jenkins" {
-  autoscaling_group_name = aws_autoscaling_group.jenkins.name
-  lb_target_group_arn    = aws_lb_target_group.jenkins.arn
 }
