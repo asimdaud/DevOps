@@ -1,9 +1,6 @@
 name: Terraform Format
 
 on:
-  pull_request:
-    branches:
-      - master
   push:
     paths:
       - 'apps/jenkins/**'
