@@ -3,14 +3,14 @@ variable "deploy_env" {
   default = "dev"  
 }
 
-variable "app_name" {
+variable "source_repo" {
   description = "Application's name"
   default = "my-application"  
 }
 
 locals {
   global_tags = {
-    "SourceRepo"  = var.app_name
+    "SourceRepo"  = var.source_repo
     "Environment" = var.deploy_env
   }
 }
