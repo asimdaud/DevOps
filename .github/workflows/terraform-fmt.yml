@@ -25,3 +25,10 @@ jobs:
         terraform fmt -check
       continue-on-error: true
       working-directory: ./apps/
+
+    - name: Commit
+      run: |
+        git config --global user.name 'No Name'
+        git config --global user.email 'noname@users.noreply.github.com'
+        git commit -am "Automated report"
+        git push 
