@@ -19,7 +19,7 @@ variable "instance_type" {
 
 variable "key_name" {
   type = string
-  default = "techiescamp"
+  default = "asimdaud"
 }
 
 variable "security_group_ids" {
